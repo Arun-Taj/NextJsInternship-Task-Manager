@@ -1,23 +1,28 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useTasks } from '@/context/TaskContext'
+import { useState } from "react";
+import { useTasks } from "@/context/TaskContext";
 
 export default function TaskForm() {
-  const { addTask } = useTasks()
+  const { addTask } = useTasks();
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    dueDate: '',
-    priority: 'Medium' as 'High' | 'Medium' | 'Low'
-  })
+    title: "",
+    description: "",
+    dueDate: "",
+    priority: "Medium" as "High" | "Medium" | "Low",
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.title || !formData.dueDate) return
-    addTask(formData)
-    setFormData({ title: '', description: '', dueDate: '', priority: 'Medium' })
-  }
+    e.preventDefault();
+    if (!formData.title || !formData.dueDate) return;
+    addTask(formData);
+    setFormData({
+      title: "",
+      description: "",
+      dueDate: "",
+      priority: "Medium",
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="mb-8 p-4 bg-gray-100 rounded-lg">
@@ -26,32 +31,38 @@ export default function TaskForm() {
           type="text"
           placeholder="Title"
           value={formData.title}
-          onChange={e => setFormData({ ...formData, title: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           className="p-2 border rounded"
           required
         />
         <input
           type="date"
           value={formData.dueDate}
-          onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, dueDate: e.target.value })
+          }
           className="p-2 border rounded"
           required
         />
-        <select
-          value={formData.priority}
-          onChange={e => setFormData({ ...formData, priority: e.target.value as any })}
-          className="p-2 border rounded"
-        >
-          <option value="High">High Priority</option>
-          <option value="Medium">Medium Priority</option>
-          <option value="Low">Low Priority</option>
-        </select>
+        
+          <select
+            value={formData.priority}
+            onChange={(e) =>
+              setFormData({ ...formData, priority: e.target.value as any })
+            }
+            className="p-2 border rounded"
+          >
+            <option value="High">High Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="Low">Low Priority</option>
+          </select>
         <textarea
           placeholder="Description"
           value={formData.description}
-          onChange={e => setFormData({ ...formData, description: e.target.value })}
-          className="p-2 border rounded overflow-hidden"
-          
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
+          className="p-2 border rounded resize-none h-24"
         />
       </div>
       <button
@@ -61,5 +72,5 @@ export default function TaskForm() {
         Add Task
       </button>
     </form>
-  )
+  );
 }

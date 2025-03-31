@@ -171,7 +171,7 @@ export default function TaskList() {
                           description: e.target.value,
                         })
                       }
-                      className="text-gray-600 mb-2 w-full border p-1 rounded text-sm md:text-lg lg:text-xl"
+                      className="text-gray-600 mb-2 w-full border p-1  rounded text-sm md:text-lg lg:text-xl resize-none"
                     />
                     <input
                       type="date"
