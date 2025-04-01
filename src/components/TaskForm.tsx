@@ -28,6 +28,13 @@ export default function TaskForm() {
   return (
     <form
       onSubmit={handleSubmit}
+      onKeyDown={(e) => {
+        // Handle Enter key submission for all form elements
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          e.currentTarget.requestSubmit();
+        }
+      }}
       className="mb-8 p-6 bg-white rounded-xl shadow-md transition-all duration-300 ease-in-out"
     >
       <div className="space-y-6">
