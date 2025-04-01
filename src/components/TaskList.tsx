@@ -2,23 +2,13 @@
 
 import { useState } from "react";
 import { useTasks } from "@/context/TaskContext";
-import {
-  
-  TrashIcon,
-  CheckIcon,
-} from "@heroicons/react/24/outline";
+import { TrashIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { FaRegEdit, FaSave, FaTimes } from "react-icons/fa";
 
 export default function TaskList() {
-  // Destructure the tasks and functions from context.
-  // Note: updateTask should be defined in your context to update an existing task.
   const { tasks, editTask, deleteTask, toggleTask } = useTasks();
   const [filter, setFilter] = useState<"all" | "completed" | "pending">("all");
-
-  // State to track which task is currently being edited.
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-
-  // State to hold the edited values for the task.
   const [editedTask, setEditedTask] = useState({
     title: "",
     description: "",
@@ -26,14 +16,12 @@ export default function TaskList() {
     priority: "Low" as "High" | "Medium" | "Low",
   });
 
-  // Filter tasks based on the current filter.
   const filteredTasks = tasks.filter((task) => {
     if (filter === "completed") return task.completed;
     if (filter === "pending") return !task.completed;
     return true;
   });
 
-  // Called when the edit icon is clicked.
   const handleEditClick = (task: (typeof tasks)[number]) => {
     setEditingTaskId(task.id);
     setEditedTask({
@@ -44,72 +32,61 @@ export default function TaskList() {
     });
   };
 
-  // Save changes to the task by calling the context's updateTask function.
   const handleSave = (id: string) => {
-    if (editTask) {
-      editTask(id, editedTask);
-    }
+    editTask?.(id, editedTask);
     setEditingTaskId(null);
   };
 
-  // Cancel editing mode.
-  const handleCancel = () => {
-    setEditingTaskId(null);
-  };
+  const handleCancel = () => setEditingTaskId(null);
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto px-4">
       {/* Filter Buttons */}
-      <div className="mb-4 flex gap-2">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-4 py-2 rounded ${
-            filter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilter("completed")}
-          className={`px-4 py-2 rounded ${
-            filter === "completed" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          Completed
-        </button>
-        <button
-          onClick={() => setFilter("pending")}
-          className={`px-4 py-2 rounded ${
-            filter === "pending" ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          Pending
-        </button>
+      <div className="mb-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
+        {(["all", "completed", "pending"] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
+              filter === f
+                ? "bg-blue-600 text-white shadow-md"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
+          >
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* Task List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredTasks.map((task) => (
           <div
             key={task.id}
-            className={`p-4 border rounded-lg ${
-              task.completed ? "bg-green-50" : "bg-white"
+            className={`group p-4 border rounded-xl transition-all ${
+              task.completed
+                ? "bg-gray-50 border-gray-200"
+                : "bg-white border-gray-200 hover:border-blue-200 hover:shadow-lg"
             }`}
           >
-            <div className="flex justify-between items-start">
-              <div className="flex-1 ">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-start justify-between">
+              {/* Main Content */}
+              <div className="flex-1 space-y-3">
                 {/* Title and Priority */}
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex flex-wrap items-start gap-3">
                   <button
                     onClick={() => toggleTask(task.id)}
-                    className={`w-5 h-5 flex items-center justify-center border rounded ${
-                      task.completed ? "bg-green-500 border-green-500" : ""
+                    className={`shrink-0 w-6 h-6 flex items-center justify-center rounded-md border-2 transition-all ${
+                      task.completed
+                        ? "bg-green-500 border-green-500"
+                        : "border-gray-300 hover:border-blue-500"
                     }`}
                   >
                     {task.completed && (
                       <CheckIcon className="w-4 h-4 text-white" />
                     )}
                   </button>
+
                   {editingTaskId === task.id ? (
                     <input
                       type="text"
@@ -117,24 +94,27 @@ export default function TaskList() {
                       onChange={(e) =>
                         setEditedTask({ ...editedTask, title: e.target.value })
                       }
-                      className="text-lg font-semibold border-b border-gray-300 focus:outline-none"
+                      className="flex-1 text-lg font-semibold border-b-2 border-blue-500 focus:outline-none py-1"
                     />
                   ) : (
                     <h3
-                      className={`text-sm md:text-lg lg:text-xl font-semibold ${
-                        task.completed ? "line-through text-gray-500" : ""
+                      className={`flex-1 text-base md:text-lg font-semibold ${
+                        task.completed
+                          ? "line-through text-gray-400"
+                          : "text-gray-700"
                       }`}
                     >
                       {task.title}
                     </h3>
                   )}
+
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                       task.priority === "High"
-                        ? "bg-red-200 text-red-800"
+                        ? "bg-red-100 text-red-700"
                         : task.priority === "Medium"
-                        ? "bg-yellow-200 text-yellow-800"
-                        : "bg-green-200 text-green-800"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-green-100 text-green-700"
                     }`}
                   >
                     {editingTaskId === task.id ? (
@@ -149,6 +129,7 @@ export default function TaskList() {
                               | "Low",
                           })
                         }
+                        className="bg-transparent focus:outline-none cursor-pointer"
                       >
                         <option value="High">High</option>
                         <option value="Medium">Medium</option>
@@ -161,74 +142,88 @@ export default function TaskList() {
                 </div>
 
                 {/* Description and Due Date */}
-                {editingTaskId === task.id ? (
-                  <>
-                    <textarea
-                      value={editedTask.description}
-                      onChange={(e) =>
-                        setEditedTask({
-                          ...editedTask,
-                          description: e.target.value,
-                        })
-                      }
-                      className="text-gray-600 mb-2 w-full border p-1  rounded text-sm md:text-lg lg:text-xl resize-none"
-                    />
-                    <input
-                      type="date"
-                      // Assuming dueDate is stored in an ISO string format.
-                      value={
-                        new Date(editedTask.dueDate).toISOString().split("T")[0]
-                      }
-                      onChange={(e) =>
-                        setEditedTask({
-                          ...editedTask,
-                          dueDate: e.target.value,
-                        })
-                      }
-                      className="text-sm text-gray-500 border p-1 rounded"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <div className="text-gray-600 mb-2 max-h-[8rem] overflow-y-auto">
-                      {task.description}
-                    </div>
-                    <p className="text-sm text-black font-semibold">
-                      Due: {new Date(task.dueDate).toLocaleDateString()}
-                    </p>
-                  </>
-                )}
+                <div className="ml-9 sm:ml-8 space-y-2">
+                  {editingTaskId === task.id ? (
+                    <>
+                      <textarea
+                        value={editedTask.description}
+                        onChange={(e) =>
+                          setEditedTask({
+                            ...editedTask,
+                            description: e.target.value,
+                          })
+                        }
+                        className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 text-sm h-32 resize-y"
+                        placeholder="Add description..."
+                      />
+                      <input
+                        type="date"
+                        value={editedTask.dueDate}
+                        onChange={(e) =>
+                          setEditedTask({
+                            ...editedTask,
+                            dueDate: e.target.value,
+                          })
+                        }
+                        className="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {task.description && (
+                        <p className="text-gray-800 text-sm leading-relaxed">
+                          {task.description}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <span>📅</span>
+                        <span>
+                          {new Date(task.dueDate).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+
               {/* Action Buttons */}
-              <div className="flex flex-col gap-2">
+              <div className="flex sm:flex-col gap-2 sm:gap-3 justify-end sm:items-center">
                 {editingTaskId === task.id ? (
                   <>
                     <button
                       onClick={() => handleSave(task.id)}
-                      className="p-2 text-green-500 hover:text-green-700 cursor-pointer"
+                      className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+                      title="Save changes"
                     >
-                      <FaSave className="w-5 h-5" />
+                      <FaSave className="w-4 h-4" />
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="p-2 text-gray-500 hover:text-gray-700 cursor-pointer"
+                      className="p-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer"
+                      title="Cancel editing"
                     >
-                      <FaTimes className="w-5 h-5" />
+                      <FaTimes className="w-4 h-4" />
                     </button>
                   </>
                 ) : (
                   <>
                     <button
                       onClick={() => handleEditClick(task)}
-                      className="p-2 text-blue-500 hover:text-blue-700 cursor-pointer"
+                      className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
+                      title="Edit task"
                     >
-                      <FaRegEdit className="w-5 h-5" />
+                      <FaRegEdit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => deleteTask(task.id)}
-                      className="p-2 text-red-500 hover:text-red-700 cursor-pointer"
+                      className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors cursor-pointer"
+                      title="Delete task"
                     >
-                      <TrashIcon className="w-5 h-5" />
+                      <TrashIcon className="w-4 h-4" />
                     </button>
                   </>
                 )}
