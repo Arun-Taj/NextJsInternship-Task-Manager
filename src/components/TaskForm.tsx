@@ -105,7 +105,7 @@ export default function TaskForm() {
         {/* Description Input */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">
-            Task Description 
+            Task Description
           </label>
           <textarea
             placeholder="Describe your task..."
